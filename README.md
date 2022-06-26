@@ -1,23 +1,10 @@
 # nextcord-ext-ipc
 
-<p style="text-align: center">
-        <a href="https://github.com/nextcord/nextcord-ext-ipc/actions?query=workflow%3AAnalyze+event%3Apush">
-            <img alt="Analyze Status"
-                 src="https://github.com/nextcord/nextcord-ext-ipc/workflows/Analyze/badge.svg?event=push" />
-        </a>
-        <a href="https://github.com/nextcord/nextcord-ext-ipc/actions?query=workflow%3ABuild+event%3Apush">
-            <img alt="Build Status"
-                 src="https://github.com/nextcord/nextcord-ext-ipc/workflows/Build/badge.svg?event=push" />
-        </a>
-        <a href="https://github.com/nextcord/nextcord-ext-ipc/actions?query=workflow%3ADeploy+event%3Apush">
-            <img alt="Deploy Status"
-                 src="https://github.com/nextcord/nextcord-ext-ipc/workflows/Deploy/badge.svg?event=push" />
-        </a>
-        <a href="https://github.com/Ext-Creators/nextcord-ext-ipc/actions?query=workflow%3ALint+event%3Apush">
-            <img alt="Lint Status"
-                 src="https://github.com/nextcord/nextcord-ext-ipc/workflows/Lint/badge.svg?event=push" />
-        </a>
-</p>
+[![Discord server invite](https://img.shields.io/discord/881118111967883295?color=blue&label=Discord)](https://discord.gg/ZebatWssCB)
+[![PyPI version info](https://img.shields.io/pypi/v/nextcord-ext-ipc.svg)](https://pypi.python.org/pypi/nextcord-ext-ipc)
+[![Analyze Status](https://github.com/nextcord/nextcord-ext-ipc/workflows/Analyze/badge.svg?event=push)](https://github.com/nextcord/nextcord-ext-ipc/actions?query=workflow%3AAnalyze+event%3Apush)
+[![Build Status](https://github.com/nextcord/nextcord-ext-ipc/workflows/Build/badge.svg?event=push)](https://github.com/nextcord/nextcord-ext-ipc/actions?query=workflow%3ABuild+event%3Apush)
+[![Lint Status](https://github.com/nextcord/nextcord-ext-ipc/workflows/Lint/badge.svg?event=push)](https://github.com/Ext-Creators/nextcord-ext-ipc/actions?query=workflow%3ALint+event%3Apush)
 
 ## About
 
@@ -25,17 +12,25 @@ A Nextcord extension for inter-process communication.
 
 ## Installation
 
-Python **>=3.6.0** is required.
+**Python 3.8 or higher is required**
+
+It is necessary to first install [Nextcord](https://github.com/nextcord/nextcord)
+
+Then install the extension by running one of the following commands:
 
 ```py 
-pip install --upgrade nextcord-ext-ipc
+# Linux/macOS
+python3 -m pip install -U nextcord-ext-ipc
+
+# Windows
+py -3 -m pip install -U nextcord-ext-ipc
 ```
 
 ## Links 
 
-- [Documentation](https://nextcord-ext-ipc.readthedocs.io)
+- [Documentation](https://ipc.docs.nextcord.dev/)
 - [Usage Examples](https://github.com/nextcord/nextcord-ext-ipc/tree/master/examples)
-- [Support Discord Server](https://discord.gg/ZebatWssCB)
+- [Support Discord Server](https://discord.gg/nextcord)
 
 ## License
 

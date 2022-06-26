@@ -1,6 +1,8 @@
 import re
 import setuptools
 
+with open("README.md", "r") as fh:
+    long_description = fh.read()
 
 classifiers = [
     "Development Status :: 5 - Production/Stable",
@@ -43,7 +45,7 @@ packages = [
 ]
 
 project_urls = {
-    "Documentation": "https://nextcord-ext-ipc.readthedocs.io",
+    "Documentation": "https://ipc.docs.nextcord.dev/",
     "Issue Tracker": "https://github.com/nextcord/nextcord-ext-ipc/issues",
     "Source": "https://github.com/nextcord/nextcord-ext-ipc",
 }
@@ -76,6 +78,8 @@ setuptools.setup(
     author="Nextcord Developers",
     classifiers=classifiers,
     description="A Nextcord extension for inter-process communication.",
+    long_description=long_description,
+    long_description_content_type="text/markdown",
     extras_require=extras_require,
     install_requires=install_requires,
     license="Apache Software License",

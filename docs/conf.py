@@ -1,8 +1,13 @@
 import re
+import sys
+import os
+
 
 project = "nextcord-ext-ipc"
-copyright = "2021, Nextcord Developers"
-author = "Nextcord Developers"
+copyright = "2021, nextcord"
+author = "nextcord"
+
+sys.path.insert(0, os.path.abspath(".."))
 
 _version_regex = r"^version = ('|\")((?:[0-9]+\.)*[0-9]+(?:\.?([a-z]+)(?:\.?[0-9])?)?)\1$"
 
@@ -44,7 +49,7 @@ autodoc_typehints = "none"
 intersphinx_mapping = {
     "aiohttp": ("https://docs.aiohttp.org/en/stable/", None),
     "python": ("https://docs.python.org/3", None),
-    "nextcord": ("https://nextcord.readthedocs.io/en/latest", None),
+    "nextcord": ("https://docs.nextcord.dev/en/stable", None),
 }
 
 highlight_language = "python3"
