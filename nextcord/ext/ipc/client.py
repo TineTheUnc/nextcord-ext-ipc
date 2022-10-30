@@ -68,4 +68,4 @@ class Client:
 
             log.debug("Client < %r", recv)
 
-            return recv.json()
+            return recv
