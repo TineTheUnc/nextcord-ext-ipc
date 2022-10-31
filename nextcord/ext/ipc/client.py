@@ -1,8 +1,8 @@
+import asyncio
 import logging
 
+import aiohttp
 from .errors import *
-import websockets
-import json
 
 log = logging.getLogger(__name__)
 
@@ -21,26 +21,74 @@ class Client:
         The secret key for your IPC server. Must match the server secret_key or requests will not go ahead, defaults to None
     """
 
-    def __init__(self, host="localhost", port=None, secret_key=None, ssl_mode=False, use_port=True):
+    def __init__(self, host="localhost", port=None, multicast_port=20000, domain=None, ssl_mode=False, secret_key=None):
         """Constructor"""
+        self.loop = asyncio.get_event_loop()
 
         self.secret_key = secret_key
 
         self.host = host
         self.port = port
+        self.domain = domain
         self.ssl_mode = ssl_mode
-        self.use_port = use_port
 
+        self.session = None
 
         self.websocket = None
+        self.multicast = None
 
+        self.multicast_port = multicast_port
 
     @property
     def url(self):
-        if self.use_port:
-            return "{0}://{1}:{2}".format("wss" if self.ssl_mode else "ws",self.host, self.port )
+        if self.ssl_mode:
+            protocol = "wss"
         else:
-            return "{0}://{1}".format("wss" if self.ssl_mode else "ws",self.host)
+            protocol = "ws"
+        if self.domain:
+            return "{0}://{1}".format(protocol,self.host)
+        else:
+            return "{0}://{1}:{2}".format(protocol,self.host, self.port if self.port else self.multicast_port)
+
+    async def init_sock(self):
+        """Attempts to connect to the server
+
+        Returns
+        -------
+        :class:`~aiohttp.ClientWebSocketResponse`
+            The websocket connection to the server
+        """
+        log.info("Initiating WebSocket connection.")
+        self.session = aiohttp.ClientSession()
+
+        if not self.port and not self.domain:
+            log.debug(
+                "No port was provided - initiating multicast connection at %s.",
+                self.url,
+            )
+            self.multicast = await self.session.ws_connect(self.url, autoping=False)
+
+            payload = {"connect": True, "headers": {"Authorization": self.secret_key}}
+            log.debug("Multicast Server < %r", payload)
+
+            await self.multicast.send_json(payload)
+            recv = await self.multicast.receive()
+
+            log.debug("Multicast Server > %r", recv)
+
+            if recv.type in (aiohttp.WSMsgType.CLOSE, aiohttp.WSMsgType.CLOSED):
+                log.error(
+                    "WebSocket connection unexpectedly closed. Multicast Server is unreachable."
+                )
+                raise NotConnected("Multicast server connection failed.")
+
+            port_data = recv.json()
+            self.port = port_data["port"]
+
+        self.websocket = await self.session.ws_connect(self.url, autoping=False, autoclose=False)
+        log.info("Client connected to %s", self.url)
+
+        return self.websocket
 
     async def request(self, endpoint, **kwargs):
         """Make a request to the IPC server process.
@@ -53,19 +101,44 @@ class Client:
             The data to send to the endpoint
         """
         log.info("Requesting IPC Server for %r with %r", endpoint, kwargs)
+        if not self.session:
+            await self.init_sock()
 
         payload = {
             "endpoint": endpoint,
             "data": kwargs,
             "headers": {"Authorization": self.secret_key},
         }
-        async with websockets.connect(self.url) as websocket:
-            await websocket.send(json.dumps(payload))
 
-            log.debug("Client > %r", payload)
+        await self.websocket.send_json(payload)
 
-            recv = await websocket.recv()
+        log.debug("Client > %r", payload)
 
-            log.debug("Client < %r", recv)
+        recv = await self.websocket.receive()
 
-            return recv
+        log.debug("Client < %r", recv)
+
+        if recv.type == aiohttp.WSMsgType.PING:
+            log.info("Received request to PING")
+            await self.websocket.ping()
+
+            return await self.request(endpoint, **kwargs)
+
+        if recv.type == aiohttp.WSMsgType.PONG:
+            log.info("Received PONG")
+            return await self.request(endpoint, **kwargs)
+
+        if recv.type == aiohttp.WSMsgType.CLOSED:
+            log.error(
+                "WebSocket connection unexpectedly closed. IPC Server is unreachable. Attempting reconnection in 5 seconds."
+            )
+
+            await self.session.close()
+
+            await asyncio.sleep(5)
+
+            await self.init_sock()
+
+            return await self.request(endpoint, **kwargs)
+
+        return recv.json()
