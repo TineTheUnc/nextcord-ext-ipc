@@ -47,7 +47,7 @@ class Client:
         else:
             protocol = "ws"
         if self.domain:
-            return "{0}://{1}".format(protocol,self.host)
+            return "{0}://{1}".format(protocol,self.domain)
         else:
             return "{0}://{1}:{2}".format(protocol,self.host, self.port if self.port else self.multicast_port)
 
