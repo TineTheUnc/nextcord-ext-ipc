@@ -41,6 +41,7 @@ class Client:
 
     @property
     def url(self):
+        """Websocket url"""
         if self.ssl_mode:
             protocol = "wss"
         else:
